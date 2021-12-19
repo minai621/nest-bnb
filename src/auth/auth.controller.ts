@@ -1,25 +1,38 @@
 import {
   Body,
   Controller,
-  Get,
   Post,
-  UsePipes,
+  Res,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { StoredUserType } from './auth.model';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { SignupUserDTO } from './dto/signup-user.dto';
+import { Response } from 'express';
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Get('/signup')
-  getAllStoredUserType() {
-    return this.authService.getAllUser;
+  @Post('/signup')
+  createUser(@Body(ValidationPipe) signupUserDTO: SignupUserDTO) {
+    return this.authService.createUser(signupUserDTO);
   }
 
-  @Post()
-  signup(@Body() signupUserDTO: SignupUserDTO) {
-    return this.authService.signupUser(signupUserDTO);
+  @Post('/signin')
+  async signinUser(
+    @Body() signupUserDTO: SignupUserDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { newUserWithoutPassword, accessToken } =
+      await this.authService.signinUser(signupUserDTO);
+    res.cookie('access_token', accessToken);
+  }
+
+  @Post('/test')
+  @UseGuards(AuthGuard())
+  test() {
+    return 'test';
   }
 }
