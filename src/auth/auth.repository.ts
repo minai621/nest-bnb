@@ -2,7 +2,11 @@ import { EntityRepository, Repository } from 'typeorm';
 import { StoredUserEntity } from './auth.entity';
 import { SignupUserDTO } from './dto/signup-user.dto';
 import * as bcrypt from 'bcryptjs';
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @EntityRepository(StoredUserEntity)
 export class AuthRepository extends Repository<StoredUserEntity> {
@@ -27,9 +31,11 @@ export class AuthRepository extends Repository<StoredUserEntity> {
       await this.save(user);
       return user;
     } catch (error) {
-      throw new BadRequestException(
-        `잘못된 데이터입니다. Error: ${error.code}`,
-      );
+      if (error.code === '23505') {
+        throw new ConflictException('Existing Email');
+      } else {
+        throw new InternalServerErrorException();
+      }
     }
   }
 }
