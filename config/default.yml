@@ -8,3 +8,6 @@ db:
 
 jwt:
   expiresIn: 3600
+
+apiKey:
+  key: 'AIzaSyA1cnjnETOI_sYhirMG0HyLwySVz72aCYo'
