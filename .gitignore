@@ -36,3 +36,6 @@ lerna-debug.log*
 
 #orm
 ./src/ormconfig.json
+
+#config
+./config/default.yml
